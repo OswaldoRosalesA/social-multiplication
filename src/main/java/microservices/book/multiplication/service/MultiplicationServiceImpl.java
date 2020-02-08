@@ -2,11 +2,12 @@ package microservices.book.multiplication.service;
 
 import lombok.AllArgsConstructor;
 import microservices.book.multiplication.domain.Multiplication;
+import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class MultiplicationServiceImpl implements MultiplicationService {
+class MultiplicationServiceImpl implements MultiplicationService {
 
     private RandomGeneratorService randomGeneratorService;
 
@@ -15,6 +16,13 @@ public class MultiplicationServiceImpl implements MultiplicationService {
         int factorA = randomGeneratorService.generateRandomFactor();
         int factorB = randomGeneratorService.generateRandomFactor();
         return new Multiplication(factorA, factorB);
+    }
+
+    @Override
+    public boolean checkAttempt(MultiplicationResultAttempt resultAttempt) {
+        return resultAttempt.getResultAttempt() ==
+                resultAttempt.getMultiplication().getFactorA() *
+                        resultAttempt.getMultiplication().getFactorB();
     }
 
 }

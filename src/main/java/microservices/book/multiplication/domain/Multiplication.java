@@ -1,20 +1,21 @@
 package microservices.book.multiplication.domain;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
-@Data
+/**
+ * This represents a Multiplication (a * b).
+ */
+@Getter
 @ToString
-public class Multiplication {
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class Multiplication {
 
-    private int factorA;
-    private int factorB;
-    private int result;
+    private final int factorA;
+    private final int factorB;
 
-    public Multiplication(int factorA, int factorB) {
-        this.factorA = factorA;
-        this.factorB = factorB;
-        this.result = factorA * factorB;
+    Multiplication(){
+        this(0,0);
     }
 
 }
