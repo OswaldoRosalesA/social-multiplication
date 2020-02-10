@@ -19,17 +19,13 @@ public class MultiplicationResultAttemptController {
     private final MultiplicationService multiplicationService;
 
     @PostMapping
-    public ResponseEntity<ResultResponse> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
-        return ResponseEntity.ok(
-                new ResultResponse(multiplicationService.checkAttempt(multiplicationResultAttempt)));
-    }
-
-    // Here we'll implement our POST later
-    @RequiredArgsConstructor
-    @NoArgsConstructor(force = true)
-    @Getter
-    protected static final class ResultResponse {
-        private final boolean correct;
+    public ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
+        boolean isCorrect = multiplicationService.checkAttempt(multiplicationResultAttempt);
+        MultiplicationResultAttempt attemptCopy = new MultiplicationResultAttempt(multiplicationResultAttempt.getResultAttempt(),
+                isCorrect,
+                multiplicationResultAttempt.getUser(),
+                multiplicationResultAttempt.getMultiplication());
+        return ResponseEntity.ok(attemptCopy);
     }
 
 }
