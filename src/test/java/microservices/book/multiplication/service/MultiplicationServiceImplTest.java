@@ -6,12 +6,14 @@ import microservices.book.multiplication.domain.User;
 import microservices.book.multiplication.repository.MultiplicationRepository;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,6 +93,27 @@ class MultiplicationServiceImplTest {
         // then
         assertThat(attemptResult).isFalse();
         verify(attemptRepository).save(attempt);
+    }
+
+    @Test
+    public void retrieveStatsTest() {
+        // given
+        Multiplication multiplication = new Multiplication(50, 60);
+        User user = new User("john_doe");
+        MultiplicationResultAttempt attempt1 = new MultiplicationResultAttempt(
+                3010, false, user, multiplication);
+        MultiplicationResultAttempt attempt2 = new MultiplicationResultAttempt(
+                3051, false, user, multiplication );
+        List<MultiplicationResultAttempt> latestAttempts = Lists.newArrayList(attempt1, attempt2);
+        given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
+        given(attemptRepository.findTop5ByUserAliasOrderByIdDesc("john_doe"))
+                .willReturn(latestAttempts);
+
+        // when
+        List<MultiplicationResultAttempt> latestAttemptsResult =
+                multiplicationServiceImpl.getStatsForUser("john_doe");
+        // then
+        assertThat(latestAttemptsResult).isEqualTo(latestAttempts);
     }
 
 }
