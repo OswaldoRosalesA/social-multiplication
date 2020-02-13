@@ -1,9 +1,12 @@
 package microservices.book.multiplication.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.domain.User;
+import microservices.book.multiplication.event.EventDispatcher;
+import microservices.book.multiplication.event.MultiplicationSolvedEvent;
 import microservices.book.multiplication.repository.MultiplicationRepository;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
@@ -15,13 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 class MultiplicationServiceImpl implements MultiplicationService {
 
-    private RandomGeneratorService randomGeneratorService;
-    private MultiplicationResultAttemptRepository attemptRepository;
-    private UserRepository userRepository;
-    private MultiplicationRepository multiplicationRepository;
+    private final RandomGeneratorService randomGeneratorService;
+    private final MultiplicationResultAttemptRepository attemptRepository;
+    private final UserRepository userRepository;
+    private final MultiplicationRepository multiplicationRepository;
+    private final EventDispatcher eventDispatcher;
 
     @Override
     public Multiplication createRandomMultiplication() {
@@ -58,6 +62,11 @@ class MultiplicationServiceImpl implements MultiplicationService {
 
         // Store the attempt
         attemptRepository.save(checkedAttempt);
+
+        // Communicates the result via Event
+        eventDispatcher.send(new MultiplicationSolvedEvent(checkedAttempt.getId(),
+                checkedAttempt.getUser().getId(),
+                correct));
 
         // Returns the result
         return correct;

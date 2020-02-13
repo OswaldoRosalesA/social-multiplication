@@ -3,6 +3,8 @@ package microservices.book.multiplication.service;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.domain.User;
+import microservices.book.multiplication.event.EventDispatcher;
+import microservices.book.multiplication.event.MultiplicationSolvedEvent;
 import microservices.book.multiplication.repository.MultiplicationRepository;
 import microservices.book.multiplication.repository.MultiplicationResultAttemptRepository;
 import microservices.book.multiplication.repository.UserRepository;
@@ -35,11 +37,18 @@ class MultiplicationServiceImplTest {
     @Mock
     private MultiplicationRepository multiplicationRepository;
 
+    @Mock
+    private EventDispatcher eventDispatcher;
+
     private MultiplicationServiceImpl multiplicationServiceImpl;
 
     @BeforeEach
     public void setUp() {
-        multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository, userRepository, multiplicationRepository);
+        multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService,
+                attemptRepository,
+                userRepository,
+                multiplicationRepository,
+                eventDispatcher);
     }
 
     @Test
@@ -64,6 +73,10 @@ class MultiplicationServiceImplTest {
                 3000, false, user, multiplication);
         MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(
                 3000, true, user, multiplication);
+        MultiplicationSolvedEvent solvedEvent = new MultiplicationSolvedEvent(
+                verifiedAttempt.getId(),
+                verifiedAttempt.getUser().getId(),
+                verifiedAttempt.isCorrect());
         given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
         given(multiplicationRepository.findByFactorAAndAndFactorB(50, 60))
                 .willReturn(Optional.empty());
@@ -74,6 +87,7 @@ class MultiplicationServiceImplTest {
         // then
         assertThat(attemptResult).isTrue();
         verify(attemptRepository).save(verifiedAttempt);
+        verify(eventDispatcher).send(solvedEvent);
     }
 
     @Test
@@ -83,6 +97,10 @@ class MultiplicationServiceImplTest {
         User user = new User("john_doe");
         MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
                 3010, false, user, multiplication);
+        MultiplicationSolvedEvent solvedEvent = new MultiplicationSolvedEvent(
+                attempt.getId(),
+                attempt.getUser().getId(),
+                attempt.isCorrect());
         given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
         given(multiplicationRepository.findByFactorAAndAndFactorB(50, 60))
                 .willReturn(Optional.empty());
@@ -93,6 +111,7 @@ class MultiplicationServiceImplTest {
         // then
         assertThat(attemptResult).isFalse();
         verify(attemptRepository).save(attempt);
+        verify(eventDispatcher).send(solvedEvent);
     }
 
     @Test
@@ -103,9 +122,8 @@ class MultiplicationServiceImplTest {
         MultiplicationResultAttempt attempt1 = new MultiplicationResultAttempt(
                 3010, false, user, multiplication);
         MultiplicationResultAttempt attempt2 = new MultiplicationResultAttempt(
-                3051, false, user, multiplication );
+                3051, false, user, multiplication);
         List<MultiplicationResultAttempt> latestAttempts = Lists.newArrayList(attempt1, attempt2);
-        given(userRepository.findByAlias("john_doe")).willReturn(Optional.empty());
         given(attemptRepository.findTop5ByUserAliasOrderByIdDesc("john_doe"))
                 .willReturn(latestAttempts);
 
