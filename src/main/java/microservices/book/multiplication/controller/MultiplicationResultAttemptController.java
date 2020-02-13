@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
 import microservices.book.multiplication.service.MultiplicationService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,17 +18,20 @@ public class MultiplicationResultAttemptController {
     private final MultiplicationService multiplicationService;
 
     @PostMapping
-    public ResponseEntity<ResultResponse> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
-        return ResponseEntity.ok(
-                new ResultResponse(multiplicationService.checkAttempt(multiplicationResultAttempt)));
+    public ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt multiplicationResultAttempt) {
+        boolean isCorrect = multiplicationService.checkAttempt(multiplicationResultAttempt);
+        MultiplicationResultAttempt attemptCopy = new MultiplicationResultAttempt(multiplicationResultAttempt.getResultAttempt(),
+                isCorrect,
+                multiplicationResultAttempt.getUser(),
+                multiplicationResultAttempt.getMultiplication());
+        return ResponseEntity.ok(attemptCopy);
     }
 
-    // Here we'll implement our POST later
-    @RequiredArgsConstructor
-    @NoArgsConstructor(force = true)
-    @Getter
-    protected static final class ResultResponse {
-        private final boolean correct;
+    @GetMapping
+    ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
+        return ResponseEntity.ok(
+                multiplicationService.getStatsForUser(alias)
+        );
     }
 
 }
