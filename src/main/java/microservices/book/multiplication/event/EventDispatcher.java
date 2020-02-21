@@ -16,8 +16,8 @@ public class EventDispatcher {
     private String multiplicationSolvedRoutingKey;
 
     public EventDispatcher(RabbitTemplate rabbitTemplate,
-                           @Value("multiplication.exchange") String multiplicationExchange,
-                           @Value("multiplication.solved.key") String multiplicationSolvedRoutingKey) {
+                           @Value("${multiplication.exchange}") String multiplicationExchange,
+                           @Value("${multiplication.solved.key}") String multiplicationSolvedRoutingKey) {
         this.rabbitTemplate = rabbitTemplate;
         this.multiplicationExchange = multiplicationExchange;
         this.multiplicationSolvedRoutingKey = multiplicationSolvedRoutingKey;
