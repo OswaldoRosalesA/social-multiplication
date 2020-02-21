@@ -1,6 +1,5 @@
 package microservices.book.multiplication.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import microservices.book.multiplication.domain.Multiplication;
 import microservices.book.multiplication.domain.MultiplicationResultAttempt;
@@ -75,6 +74,11 @@ class MultiplicationServiceImpl implements MultiplicationService {
     @Override
     public List<MultiplicationResultAttempt> getStatsForUser(String userAlias) {
         return attemptRepository.findTop5ByUserAliasOrderByIdDesc(userAlias);
+    }
+
+    @Override
+    public MultiplicationResultAttempt getResultById(Long resultId) {
+        return attemptRepository.findById(resultId).orElse(null);
     }
 
 }

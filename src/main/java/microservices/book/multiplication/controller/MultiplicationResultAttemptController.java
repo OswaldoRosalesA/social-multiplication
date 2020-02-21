@@ -28,10 +28,16 @@ public class MultiplicationResultAttemptController {
     }
 
     @GetMapping
-    ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
+    public ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
         return ResponseEntity.ok(
                 multiplicationService.getStatsForUser(alias)
         );
+    }
+
+    @GetMapping(path = "/{resultId}")
+    public ResponseEntity<MultiplicationResultAttempt> getResultById(@PathVariable("resultId") long resultId) {
+        MultiplicationResultAttempt resultAttempt = multiplicationService.getResultById(resultId);
+        return ResponseEntity.ok(resultAttempt);
     }
 
 }

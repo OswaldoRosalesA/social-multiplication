@@ -27,4 +27,11 @@ public interface MultiplicationService {
      */
     List<MultiplicationResultAttempt> getStatsForUser(String userAlias);
 
+    /**
+     *
+     * @param resultId
+     * @return an attempt search by id
+     */
+    MultiplicationResultAttempt getResultById(Long resultId);
+
 }
