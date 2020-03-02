@@ -7,7 +7,7 @@ spring:
     name: social-multiplication-client
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:./database/social-multiplication;DB_CLOSE_ON_EXIT=FALSE;
+    url: jdbc:h2:file:./database/social-multiplication;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE;
     username: sa
     password:
   jpa:
@@ -21,6 +21,19 @@ spring:
 
 server:
   port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, httptrace, loggers, metrics
 
 multiplication:
   solved:
