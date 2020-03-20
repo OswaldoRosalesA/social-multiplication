@@ -35,7 +35,7 @@ class MultiplicationServiceImpl implements MultiplicationService {
 
     @Transactional
     @Override
-    public boolean checkAttempt(MultiplicationResultAttempt resultAttempt) {
+    public MultiplicationResultAttempt checkAttempt(MultiplicationResultAttempt resultAttempt) {
         // Avoids 'hack' attempts
         Assert.isTrue(!resultAttempt.isCorrect(), "You can't send an attempt marked as correct!!");
 
@@ -68,7 +68,7 @@ class MultiplicationServiceImpl implements MultiplicationService {
                 correct));
 
         // Returns the result
-        return correct;
+        return checkedAttempt;
     }
 
     @Override
